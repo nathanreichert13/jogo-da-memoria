@@ -141,6 +141,10 @@ void sobreNos()
     cout << endl;
 }
 
+int iniciarJogo(){
+    
+}
+
 void matrizGlobalFinal(int matriz[linha][coluna], int matrizResultado[linha][coluna])
 {
 
