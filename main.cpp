@@ -27,13 +27,12 @@ void fim();
 void gerarMatrizPrincipal();
 void gerarMatrizGabarito();
 void exibirMatrizJogo();
+int lerInteiro(const string &mensagem, int min, int max);
 
 // Função que lida com a escolha do menu pelo usuário
 void menuFuncionar()
 {
-    int opcaoMenu;
-    cout << "Digite a opcao que deseja ir: ";
-    cin >> opcaoMenu;
+    int opcaoMenu = lerInteiro("Digite a opção que deseja acessar: ", 1, 4);
 
     switch (opcaoMenu) // Verifica qual opção foi escolhida
     {
@@ -50,7 +49,7 @@ void menuFuncionar()
         fim(); // Encerra o programa
         break;
     default:
-        cout << "Opcao inválida, digite novamente!" << endl;
+        cout << "Opção inválida. Digite novamente!" << endl;
         Sleep(1000); // Espera 1 segundo
         menu();      // Volta ao menu
         break;
@@ -62,7 +61,7 @@ void boasVindas()
 {
     system("cls"); // Limpa a tela
     cout << "+----------------------------------------------+" << endl;
-    cout << "|        BOAS VINDAS AO JOGO DA MEMÓRIA!       |" << endl;
+    cout << "|        BOAS-VINDAS AO JOGO DA MEMÓRIA!       |" << endl;
     cout << "+----------------------------------------------+" << endl;
     cout << "| Desenvolvido por:                            |" << endl;
     cout << "| Luiz Felipe de Souza                         |" << endl;
@@ -103,7 +102,7 @@ void sobre()
     cout << "| Desenvolvedores:                                                 |" << endl;
     cout << "| Luiz Felipe de Souza (github.com/PhilipsBr567)                   |" << endl;
     cout << "| Matheus Pompeo Dias (github.com/mapompeo)                        |" << endl;
-    cout << "| Nathan Gustavo Padilha Reichert (github.com/nathanreichert13)    |" << endl;
+    cout << "| Nathan Gustavo Padilha Reichert (github.com/nathanreichert13)   |" << endl;
     cout << "+------------------------------------------------------------------+" << endl
          << endl;
 
@@ -124,7 +123,7 @@ void comoJogar()
     cout << "| Se forem iguais: JOGADA OK, ficam visíveis.                |" << endl;
     cout << "| Se diferentes: JOGADA NOK, peças são ocultadas novamente.  |" << endl;
     cout << "| Máximo de jogadas: 24 (3x o número de pares).              |" << endl;
-    cout << "| O jogo termina ao encontrar todos os pares ou acabar as    |" << endl;
+    cout << "| O jogo termina ao encontrar todos os pares ou acabarem as  |" << endl;
     cout << "| jogadas.                                                   |" << endl;
     cout << "+------------------------------------------------------------+" << endl
          << endl;
@@ -140,11 +139,14 @@ void fim()
     cout << "+----------------------------------------------------------+" << endl;
     cout << "|                       FIM DE JOGO                        |" << endl;
     cout << "+----------------------------------------------------------+" << endl;
-    cout << "| Obrigado por jogar o Jogo da Memória!                    |" << endl;
+    cout << "| Obrigado por jogar o Jogo da Memória!                   |" << endl;
     cout << "| Esperamos que tenha se divertido!                        |" << endl;
     cout << "+----------------------------------------------------------+" << endl;
     exit(0); // Encerra a execução
 }
+
+// Gera os pares embaralhados na matrizPrincipal
+// (sem necessidade de correção nas mensagens dessa parte)
 
 // Gera os pares embaralhados na matrizPrincipal
 void gerarMatrizPrincipal()
@@ -177,7 +179,44 @@ void gerarMatrizPrincipal()
     }
 }
 
-// Cria a matrizGabarito baseada na principal, podendo aplicar uma transformação
+// Exibe a matriz que o jogador vê
+void exibirMatrizJogo()
+{
+    cout << "   0 1 2 3" << endl;
+    cout << "  --------" << endl;
+    for (int i = 0; i < LINHA; i++)
+    {
+        cout << i << "| ";
+        for (int j = 0; j < COLUNA; j++)
+        {
+            if (matrizJogo[i][j] == -1)
+                cout << "* "; // Peça ainda não revelada
+            else
+                cout << matrizJogo[i][j] << " "; // Mostra o número
+        }
+        cout << endl;
+    }
+}
+
+// Adicione esta função para exibir qualquer matriz com coordenadas
+void exibirMatrizComCoordenadas(int matriz[LINHA][COLUNA])
+{
+    cout << "   ";
+    for (int j = 0; j < COLUNA; j++)
+        cout << j << " ";
+    cout << endl;
+    cout << "  --------" << endl;
+    for (int i = 0; i < LINHA; i++)
+    {
+        cout << i << "| ";
+        for (int j = 0; j < COLUNA; j++)
+        {
+            cout << matriz[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
 void gerarMatrizGabarito()
 {
     gerarMatrizPrincipal(); // Cria a base
@@ -207,22 +246,25 @@ void gerarMatrizGabarito()
     }
 }
 
-// Exibe a matriz que o jogador vê
-void exibirMatrizJogo()
+// Função auxiliar para ler um inteiro válido do usuário
+int lerInteiro(const string &mensagem, int min, int max)
 {
-    cout << "   0 1 2 3" << endl;
-    cout << "  --------" << endl;
-    for (int i = 0; i < LINHA; i++)
+    int valor;
+    while (true)
     {
-        cout << i << "| ";
-        for (int j = 0; j < COLUNA; j++)
+        cout << mensagem;
+        cin >> valor;
+        if (cin.fail() || valor < min || valor > max)
         {
-            if (matrizJogo[i][j] == -1)
-                cout << "* "; // Peça ainda não revelada
-            else
-                cout << matrizJogo[i][j] << " "; // Mostra o número
+            cout << "Entrada inválida. Digite um número entre " << min << " e " << max << "." << endl;
+            cin.clear();             // limpa o erro
+            cin.ignore(10000, '\n'); // descarta o restante da linha
         }
-        cout << endl;
+        else
+        {
+            cin.ignore(10000, '\n'); // descarta o restante da linha
+            return valor;
+        }
     }
 }
 
@@ -235,17 +277,10 @@ void iniciarJogo()
 
     gerarMatrizGabarito(); // Cria a matriz que o jogador tentará descobrir
 
-    // Mostra a matriz por 5 segundos para memorizar
-    cout << "Memorize o tabuleiro! Voce tem 5 segundos..." << endl
+    // Mostra a matriz por 5 segundos para memorizar, agora com coordenadas
+    cout << "Memorize o tabuleiro! Você tem 5 segundos..." << endl
          << endl;
-    for (int i = 0; i < LINHA; i++)
-    {
-        for (int j = 0; j < COLUNA; j++)
-        {
-            cout << matrizGabarito[i][j] << " ";
-        }
-        cout << endl;
-    }
+    exibirMatrizComCoordenadas(matrizGabarito);
     Sleep(5000); // Espera 5 segundos
     system("cls");
 
@@ -260,7 +295,7 @@ void iniciarJogo()
     while (jogadas < maxJogadas && paresEncontrados < totalPares)
     {
         system("cls");
-        cout << "JOGO DA MEMORIA" << endl;
+        cout << "JOGO DA MEMÓRIA" << endl;
         cout << "-----------------" << endl;
         cout << "Jogadas restantes: " << maxJogadas - jogadas << endl;
         cout << "Pares encontrados: " << paresEncontrados << " de " << totalPares << endl;
@@ -271,9 +306,9 @@ void iniciarJogo()
         // Escolha da primeira peça
         do
         {
-            cout << "\nEscolha a primeira peca (linha e coluna): ";
-            cin >> l1 >> c1;
-        } while (l1 < 0 || l1 >= LINHA || c1 < 0 || c1 >= COLUNA || matrizJogo[l1][c1] != -1);
+            l1 = lerInteiro("\nEscolha a LINHA da primeira peça (0 a 3): ", 0, LINHA - 1);
+            c1 = lerInteiro("Escolha a COLUNA da primeira peça (0 a 3): ", 0, COLUNA - 1);
+        } while (matrizJogo[l1][c1] != -1);
 
         matrizJogo[l1][c1] = matrizGabarito[l1][c1]; // Revela a peça
         system("cls");
@@ -282,9 +317,9 @@ void iniciarJogo()
         // Escolha da segunda peça
         do
         {
-            cout << "\nEscolha a segunda peca (linha e coluna): ";
-            cin >> l2 >> c2;
-        } while (l2 < 0 || l2 >= LINHA || c2 < 0 || c2 >= COLUNA || matrizJogo[l2][c2] != -1 || (l1 == l2 && c1 == c2));
+            l2 = lerInteiro("\nEscolha a linha da SEGUNDA peça (0 a 3): ", 0, LINHA - 1);
+            c2 = lerInteiro("Escolha a coluna da SEGUNDA peça (0 a 3): ", 0, COLUNA - 1);
+        } while (matrizJogo[l2][c2] != -1 || (l1 == l2 && c1 == c2));
 
         matrizJogo[l2][c2] = matrizGabarito[l2][c2]; // Revela a peça
         system("cls");
@@ -294,12 +329,12 @@ void iniciarJogo()
         // Verifica se encontrou um par
         if (matrizGabarito[l1][c1] == matrizGabarito[l2][c2])
         {
-            cout << "\nJOGADA OK! Voce encontrou um par!" << endl;
+            cout << "\nJOGADA OK! Você encontrou um par!" << endl;
             paresEncontrados++;
         }
         else
         {
-            cout << "\nJOGADA NOK! As pecas sao diferentes." << endl;
+            cout << "\nJOGADA NOK! As peças são diferentes." << endl;
             matrizJogo[l1][c1] = -1; // Oculta novamente
             matrizJogo[l2][c2] = -1;
         }
@@ -311,15 +346,15 @@ void iniciarJogo()
     if (paresEncontrados == totalPares)
     {
         cout << "+------------------------------------------+" << endl;
-        cout << "|      PARABENS! VOCE VENCEU O JOGO!       |" << endl;
-        cout << "|   Voce encontrou todos os pares em " << jogadas << " jogadas! |" << endl;
+        cout << "|      PARABÉNS! VOCÊ VENCEU O JOGO!       |" << endl;
+        cout << "|   Você encontrou todos os pares em " << jogadas << " jogadas! |" << endl;
         cout << "+------------------------------------------+" << endl;
     }
     else
     {
         cout << "+--------------------------------------------+" << endl;
-        cout << "|             FIM DE JOGO!                   |" << endl;
-        cout << "| Voce nao encontrou todos os pares a tempo. |" << endl;
+        cout << "|               FIM DE JOGO!                 |" << endl;
+        cout << "| Você não encontrou todos os pares a tempo. |" << endl;
         cout << "+--------------------------------------------+" << endl;
 
         // Mostra a matriz correta
